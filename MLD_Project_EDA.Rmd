@@ -13,7 +13,7 @@ output:
     toc_float: yes
 ---
 
-```{r echo=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Clear environment of variables and functions
 rm(list = ls(all = TRUE)) 
 # Clear environmet of packages
@@ -77,20 +77,30 @@ MLD_data <- MLD_data[c('MARRIED','GDLIN','OBRAT','BLACK','HISPAN','MALE','APPROV
   + All applicants are non-Hispanic white, non Hispanic black, or Hispanic
 
 # Data Cleaning
+## Eliminate N/A
 ## Change Data Types
 ## Change Column Names
 
 ```{r}
+# Eliminate N/A
+MLD <-
+  MLD_data %>%
+  filter(GDLIN != 666) %>%
+  filter(MALE != ".") %>%
+  filter(MARRIED != ".") 
+
 # Change the type of variables
-MLD_data$GDLIN <- as.factor(MLD_data$GDLIN)
-MLD_data$BLACK <- as.factor(MLD_data$BLACK)
-MLD_data$HISPAN <- as.factor(MLD_data$HISPAN)
-MLD_data$APPROVE <- as.factor(MLD_data$APPROVE)
+MLD$GDLIN <- as.factor(MLD$GDLIN)
+MLD$BLACK <- as.factor(MLD$BLACK)
+MLD$HISPAN <- as.factor(MLD$HISPAN)
+MLD$APPROVE <- as.factor(MLD$APPROVE)
 
-colnames(MLD_data) <- c("Marrige_Status", "Credit_Meet", "Obliga_TotIncome", "Black", "Hispanic", "Gender", "Approve", "Loan_Purchase")
+# Change Column Names
+colnames(MLD) <- c("Marrige_Status", "Credit_Meet", "Obliga_TotIncome", "Black", "Hispanic", "Gender", "Approve", "Loan_Purchase")
 
-str(MLD_data)
-kable(summary(MLD_data))
+attach(MLD)
+str(MLD)
+kable(summary(MLD))
 ```
 
 # Findings from summary
@@ -100,19 +110,7 @@ kable(summary(MLD_data))
 + Most of our samples are non-black and non-hispanic males
 + 
 
-# Filtering
-```{r}
-# Eliminate N/A
-MLD <-
-  MLD_data %>%
-  filter(Credit_Meet != 666) %>%
-  filter(Gender != ".") %>%
-  filter(Marrige_Status != ".") 
-  
-attach(MLD)
-str(MLD)
-kable(summary(MLD))
-```
+
 ```{r}
 # Present descriptive statistics for the sample overall and separately for 
 # non-Hispanic white, non-Hispanic black, and Hispanic loan applicants.
@@ -157,10 +155,10 @@ binwidth=40)))
 # Histograms of quantitive variables
 ```{r}
 grid.arrange(
-  MLD_data %>% 
-    ggplot(aes(Obliga_TotIncome)) + 
+  MLD %>%
+    ggplot(aes(Obliga_TotIncome)) +
     geom_histogram(binwidth=8, fill="black"),
-  MLD_data %>% 
+  MLD %>%
     ggplot(aes(Loan_Purchase)) +
     geom_histogram(binwidth=8, fill="black"),
   ncol = 2
@@ -220,7 +218,8 @@ LogitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Bla
 summary(LogitModel)
 
 #Generate Odds Ratios
-exp(coef(LogitModel))
+OddsRatios <- exp(coef(LogitModel))
+OddsRatios
 
 
 # #Define prototypical loan applicants (you will need more than 3)
