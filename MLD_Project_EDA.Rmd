@@ -26,12 +26,13 @@ library(tidyverse)
 library(ggplot2)
 library(GGally)
 library(gridExtra)
-install.packages("kableExtra")
 library(kableExtra)
 library(stargazer)
 library(stargazer)
 library(lmtest) # for BPG test
 library(sandwich) # for robust standard error
+library(aod)
+library(Rcpp)
 ```
 
 
@@ -81,10 +82,10 @@ MLD_data <- MLD_data[c('MARRIED','GDLIN','OBRAT','BLACK','HISPAN','MALE','APPROV
 
 ```{r}
 # Change the type of variables
-# MLD_data$GDLIN <- as.factor(MLD_data$GDLIN)
-# MLD_data$BLACK <- as.factor(MLD_data$BLACK)
-# MLD_data$HISPAN <- as.factor(MLD_data$HISPAN)
-# MLD_data$APPROVE <- as.factor(MLD_data$APPROVE)
+MLD_data$GDLIN <- as.factor(MLD_data$GDLIN)
+MLD_data$BLACK <- as.factor(MLD_data$BLACK)
+MLD_data$HISPAN <- as.factor(MLD_data$HISPAN)
+MLD_data$APPROVE <- as.factor(MLD_data$APPROVE)
 
 colnames(MLD_data) <- c("Marrige_Status", "Credit_Meet", "Obliga_TotIncome", "Black", "Hispanic", "Gender", "Approve", "Loan_Purchase")
 
@@ -208,4 +209,51 @@ kable(summary(MLDW))
 
   - White group has the highest mean of Approve
   - White group has the highest mean of Credit_History_Meets_Guidlines
+
+
+# Logit Model
+```{r}
+#Estimate Logit Model
+LogitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Gender + Loan_Purchase, data = MLD, 
+                 family = "binomial")
+
+summary(LogitModel)
+
+#Generate Odds Ratios
+exp(coef(LogitModel))
+
+
+# #Define prototypical loan applicants (you will need more than 3)
+# prototype1 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 1, HISPAN = 0)
+# prototype2 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 1)
+# prototype3 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 0)
+# 
+# #Predict probabilities for prototypical individuals
+# prototype1$predictedprob <- predict (LogitModel, newdata = prototype1, type ="response")
+# prototype2$predictedprob <- predict (LogitModel, newdata = prototype2, type ="response")
+# prototype3$predictedprob <- predict (LogitModel, newdata = prototype3, type ="response")
+# 
+# prototype1
+# prototype2
+# prototype3
+```
+
+
+# Probit Model
+
+```{r}
+#Estimate Probit Model
+ProbitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Gender + Loan_Purchase, data = MLD, 
+                  family = "binomial" (link = "probit"))
+summary(ProbitModel)
+
+# #Predict probabilities for prototypical individuals
+# prototype1$predictedprob <- predict (ProbitModel, newdata = prototype1, type ="response")
+# prototype2$predictedprob <- predict (ProbitModel, newdata = prototype2, type ="response")
+# prototype3$predictedprob <- predict (ProbitModel, newdata = prototype3, type ="response")
+# 
+# prototype1
+# prototype2
+# prototype3
+```
 
