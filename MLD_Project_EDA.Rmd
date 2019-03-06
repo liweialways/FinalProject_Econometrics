@@ -1,0 +1,176 @@
+---
+title: "Mortgage Lending Analysis_EDA"
+author: "Florence Yan"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  html_document:
+    toc: yes
+    toc_depth: '3'
+  html_notebook:
+    number_sections: yes
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+---
+
+```{r echo=FALSE}
+# Clear environment of variables and functions
+rm(list = ls(all = TRUE)) 
+# Clear environmet of packages
+if(is.null(sessionInfo()$otherPkgs) == FALSE)lapply(paste("package:", names(sessionInfo()$otherPkgs), sep=""), detach, character.only = TRUE, unload = TRUE)
+```
+
+```{r message = FALSE, echo = FALSE, error = FALSE}
+library(stargazer)
+library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(gridExtra)
+library(kableExtra)
+library(stargazer)
+
+library(lmtest) # for BPG test
+library(sandwich) # for robust standard error
+```
+
+
+```{r}
+# Load data
+MLD_data <- read.csv('MLD DATA File.csv')
+```
+
+
+```{r}
+# Mutate loan/purchase into percantage
+MLD_data <- MLD_data %>% 
+  mutate(LOANPRC_percent = LOANPRC*100)
+
+#Select columns
+MLD_data <- MLD_data[c('MARRIED','GDLIN','OBRAT','BLACK','HISPAN','MALE','APPROVE','LOANPRC_percent')]
+```
+
+# Research Question 
+
+  + Controlling for relevant characteristics, is race/ethnicity associated with the outcome of a mortgage loan application? 
+
+
+# Data Description 
+
+  + APPROVE = 1 if mortgage loan was approved, = 0 otherwise
+
+  + GDLIN = 1 if credit history meets guidelines, = 0 otherwise
+
+  + LOANPRC = loan amount/purchase price
+
+  + OBRAT = other obligations as a percent of total income
+
+  + MALE = 1 if male, = 0 otherwise
+
+  + MARRIED = 1 if married, = 0 otherwise
+
+  + BLACK = 1 if black, = 0 otherwise
+
+  + HISPAN = 1 if Hispanic, = 0 otherwise
+  
+  + All applicants are non-Hispanic white, non Hispanic black, or Hispanic
+
+# Data Cleaning
+## Change Data Types
+## Change Column Names
+
+```{r}
+# Change the type of variables
+# MLD_data$GDLIN <- as.factor(MLD_data$GDLIN)
+# MLD_data$BLACK <- as.factor(MLD_data$BLACK)
+# MLD_data$HISPAN <- as.factor(MLD_data$HISPAN)
+# MLD_data$APPROVE <- as.factor(MLD_data$APPROVE)
+
+colnames(MLD_data) <- c("Marrige_Status", "Credit_Meet", "Obliga_TotIncome", "Black", "Hispanic", "Gender", "Approve", "Loan_Purchase")
+
+str(MLD_data)
+kable(summary(MLD_data))
+```
+
+# Findings from summary
++ There are 6 factors, 2 are numerical
++ There are missing values in Marrige Status and Gender
++ There are non-sense values in Credit History('666')
++ Most of our samples are non-black and non-hispanic males
++ 
+
+# Filtering
+```{r}
+# Eliminate N/A
+MLD <-
+  MLD_data %>%
+  filter(Credit_Meet != 666) %>%
+  filter(Gender != ".") %>%
+  filter(Marrige_Status != ".") 
+  
+attach(MLD)
+str(MLD)
+kable(summary(MLD))
+```
+
+# Correlations
+```{r error=FALSE, warning=FALSE, message=FALSE}
+ggpairs(MLD,lower=list(combo=wrap("facethist",  
+binwidth=40)))
+```
+
+# Histograms of quantitive variables
+```{r}
+grid.arrange(
+  MLD_data %>% 
+    ggplot(aes(Obliga_TotIncome)) + 
+    geom_histogram(binwidth=8, fill="black"),
+  MLD_data %>% 
+    ggplot(aes(Loan_Purchase)) +
+    geom_histogram(binwidth=8, fill="black"),
+  ncol = 2
+)
+```
+
+# Use tile plot to show multivariate categorical
+
+```{r}
+MLD %>%
+  group_by(Credit_Meet, Approve) %>% 
+  summarise(count = n()) %>% 
+  ggplot(aes(Credit_Meet, Approve)) + 
+  geom_tile(aes(fill = -count))
+```
+
++ Most cases are approved when applicates' credit histories meet guiedlines
+
+
+# Differenciate ethnicities
+```{r}
+# Black
+MLDB <-
+  MLD %>%
+  filter(Black == 1) 
+# Hispanic
+MLDH <-
+  MLD %>%
+  filter(Hispanic == 1)
+# White
+MLDW <-
+  MLD %>%
+  filter(Black == 0) %>%
+  filter(Hispanic == 0)
+```
+
+# Summary for each ethnicity
+```{r}
+kable(summary(MLDB))
+kable(summary(MLDH))
+kable(summary(MLDW))
+```
+
+
+## Race/ethnicity might associated with the outcome of a mortgage loan application
+
+  - White group has the highest mean of Approve
+  - White group has the highest mean of Credit_History_Meets_Guidlines
+
