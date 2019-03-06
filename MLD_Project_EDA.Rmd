@@ -26,9 +26,10 @@ library(tidyverse)
 library(ggplot2)
 library(GGally)
 library(gridExtra)
+install.packages("kableExtra")
 library(kableExtra)
 library(stargazer)
-
+library(stargazer)
 library(lmtest) # for BPG test
 library(sandwich) # for robust standard error
 ```
@@ -110,6 +111,40 @@ MLD <-
 attach(MLD)
 str(MLD)
 kable(summary(MLD))
+```
+```{r}
+# Present descriptive statistics for the sample overall and separately for 
+# non-Hispanic white, non-Hispanic black, and Hispanic loan applicants.
+
+## overall descriptive analysis
+stargazer(MLD, title = "Table 1: Data Distribution", type = "text")
+head(MLD)
+
+## descriptive analysis in different races
+MLD %>% 
+  select(Obliga_TotIncome, Black, Hispanic)%>%
+  mutate(race = ifelse(Black == 0 & Hispanic == 0, "White", ifelse(Black == 1 & Hispanic == 0, "Black", "Hispanic" ))) %>%
+  group_by(race) %>%
+  mutate(id = 1:n()) %>% 
+  as.data.frame() %>% 
+  spread(race, Obliga_TotIncome) %>% 
+  select(-id) %>% 
+  stargazer(digits = 0, header = F, 
+            title = "Table 3: Loan_purchase data distribution", 
+            type = "text")
+
+MLD %>% 
+  select(Loan_Purchase, Black, Hispanic)%>%
+  mutate(race = ifelse(Black == 0 & Hispanic == 0, "White", ifelse(Black == 1 & Hispanic == 0, "Black", "Hispanic" ))) %>%
+  group_by(race) %>%
+  mutate(id = 1:n()) %>% 
+  as.data.frame() %>% 
+  spread(race, Loan_Purchase) %>% 
+  select(-id) %>% 
+  stargazer(digits = 0, header = F, 
+            title = "Table 3: Loan_purchase data distribution", 
+            type = "text")
+
 ```
 
 # Correlations
