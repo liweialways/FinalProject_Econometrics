@@ -31,6 +31,7 @@ library(stargazer)
 library(stargazer)
 library(lmtest) # for BPG test
 library(sandwich) # for robust standard error
+install.packages("aod")
 library(aod)
 library(Rcpp)
 ```
@@ -117,7 +118,6 @@ kable(summary(MLD))
 
 ## overall descriptive analysis
 stargazer(MLD, title = "Table 1: Data Distribution", type = "text")
-head(MLD)
 
 ## descriptive analysis in different races
 MLD %>% 
@@ -129,7 +129,7 @@ MLD %>%
   spread(race, Obliga_TotIncome) %>% 
   select(-id) %>% 
   stargazer(digits = 0, header = F, 
-            title = "Table 3: Loan_purchase data distribution", 
+            title = "Table 2: Obligation / Total Income Data Distribution", 
             type = "text")
 
 MLD %>% 
@@ -141,7 +141,7 @@ MLD %>%
   spread(race, Loan_Purchase) %>% 
   select(-id) %>% 
   stargazer(digits = 0, header = F, 
-            title = "Table 3: Loan_purchase data distribution", 
+            title = "Table 3: Loan / Purchase Data Distribution", 
             type = "text")
 
 ```
