@@ -27,11 +27,8 @@ library(ggplot2)
 library(GGally)
 library(gridExtra)
 library(kableExtra)
-library(stargazer)
-library(stargazer)
-library(lmtest) # for BPG test
-library(sandwich) # for robust standard error
-install.packages("aod")
+#library(lmtest) # for BPG test
+#library(sandwich) # for robust standard error
 library(aod)
 library(Rcpp)
 ```
@@ -50,6 +47,8 @@ MLD_data <- MLD_data %>%
 
 #Select columns
 MLD_data <- MLD_data[c('MARRIED','GDLIN','OBRAT','BLACK','HISPAN','MALE','APPROVE','LOANPRC_percent')]
+
+summary(MLD_data)
 ```
 
 # Research Question 
@@ -83,12 +82,9 @@ MLD_data <- MLD_data[c('MARRIED','GDLIN','OBRAT','BLACK','HISPAN','MALE','APPROV
 ## Change Column Names
 
 ```{r}
-# Eliminate N/A
-MLD <-
-  MLD_data %>%
-  filter(GDLIN != 666) %>%
-  filter(MALE != ".") %>%
-  filter(MARRIED != ".") 
+# Eliminate unreasonable values 
+MLD <- subset(MLD_data, LOANPRC_percent <= 100 & MALE != "." & MARRIED != "." & (GDLIN == 1 | GDLIN == 0))
+
 
 # Change the type of variables
 MLD$GDLIN <- as.factor(MLD$GDLIN)
@@ -210,17 +206,18 @@ kable(summary(MLDW))
 
 
 # Logit Model
+
 ```{r}
 #Estimate Logit Model
-LogitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Gender + Loan_Purchase, data = MLD, 
-                 family = "binomial")
+#LogitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Gender + Loan_Purchase, data = MLD, family = "binomial")
+
+LogitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Loan_Purchase, data = MLD, family = "binomial")
 
 summary(LogitModel)
 
 #Generate Odds Ratios
 OddsRatios <- exp(coef(LogitModel))
 OddsRatios
-
 
 # #Define prototypical loan applicants (you will need more than 3)
 # prototype1 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 1, HISPAN = 0)
@@ -242,7 +239,9 @@ OddsRatios
 
 ```{r}
 #Estimate Probit Model
-ProbitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Gender + Loan_Purchase, data = MLD, 
+# ProbitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Gender + Loan_Purchase, data = MLD, 
+#                   family = "binomial" (link = "probit"))
+ProbitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Black + Hispanic + Loan_Purchase, data = MLD, 
                   family = "binomial" (link = "probit"))
 summary(ProbitModel)
 
