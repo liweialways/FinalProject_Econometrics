@@ -219,6 +219,9 @@ summary(LogitModel)
 OddsRatios <- exp(coef(LogitModel))
 OddsRatios
 
+#Generate Log-Likelihood
+logLik(LogitModel)
+
 # #Define prototypical loan applicants (you will need more than 3)
 # prototype1 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 1, HISPAN = 0)
 # prototype2 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 1)

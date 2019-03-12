@@ -1269,6 +1269,9 @@ OddsRatios</code></pre>
 ##        3.4305891        1.6185218       43.2265786        0.9666758 
 ##           Black1        Hispanic1    Loan_Purchase 
 ##        0.4192788        0.4231520        0.9842253</code></pre>
+<pre class="r"><code>#Generate Log-Likelihood
+logLik(LogitModel)</code></pre>
+<pre><code>## 'log Lik.' -462.5456 (df=7)</code></pre>
 <pre class="r"><code># #Define prototypical loan applicants (you will need more than 3)
 # prototype1 &lt;- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 1, HISPAN = 0)
 # prototype2 &lt;- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 1)
