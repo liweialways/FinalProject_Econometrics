@@ -222,19 +222,19 @@ OddsRatios
 #Generate Log-Likelihood
 logLik(LogitModel)
 
-# #Define prototypical loan applicants (you will need more than 3)
-# prototype1 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 1, HISPAN = 0)
-# prototype2 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 1)
-# prototype3 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 0)
-# 
-# #Predict probabilities for prototypical individuals
-# prototype1$predictedprob <- predict (LogitModel, newdata = prototype1, type ="response")
-# prototype2$predictedprob <- predict (LogitModel, newdata = prototype2, type ="response")
-# prototype3$predictedprob <- predict (LogitModel, newdata = prototype3, type ="response")
-# 
-# prototype1
-# prototype2
-# prototype3
+#Define prototypical loan applicants (you will need more than 3)
+prototype1 <- data.frame(OBRAT= Marrige_Status = 1, mean(MLD$OBRAT), BLACK = 1, HISPAN = 0)
+prototype2 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 1)
+prototype3 <- data.frame(OBRAT=mean(MLD$OBRAT),BLACK = 0, HISPAN = 0)
+
+#Predict probabilities for prototypical individuals
+prototype1$predictedprob <- predict (LogitModel, newdata = prototype1, type ="response")
+prototype2$predictedprob <- predict (LogitModel, newdata = prototype2, type ="response")
+prototype3$predictedprob <- predict (LogitModel, newdata = prototype3, type ="response")
+
+prototype1
+prototype2
+prototype3
 ```
 
 
@@ -248,6 +248,8 @@ ProbitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Bl
                   family = "binomial" (link = "probit"))
 summary(ProbitModel)
 
+#Generate Log-Likelihood
+logLik(Prob       itModel)
 # #Predict probabilities for prototypical individuals
 # prototype1$predictedprob <- predict (ProbitModel, newdata = prototype1, type ="response")
 # prototype2$predictedprob <- predict (ProbitModel, newdata = prototype2, type ="response")
