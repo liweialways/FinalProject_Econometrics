@@ -249,7 +249,7 @@ ProbitModel = glm(Approve ~ Marrige_Status + Credit_Meet + Obliga_TotIncome + Bl
 summary(ProbitModel)
 
 #Generate Log-Likelihood
-logLik(Prob       itModel)
+logLik(ProbitModel)
 # #Predict probabilities for prototypical individuals
 # prototype1$predictedprob <- predict (ProbitModel, newdata = prototype1, type ="response")
 # prototype2$predictedprob <- predict (ProbitModel, newdata = prototype2, type ="response")
